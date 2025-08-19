@@ -9,8 +9,15 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-temporary-key-change-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)  # 임시로 True로 설정
-ALLOWED_HOSTS = ['*']  # 모든 호스트 허용 (개발 중에만)
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = [
+    'store-marketing-survey.onrender.com',
+    'https://store-marketing-survey.onrender.com',
+    '.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    '*'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -33,6 +40,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# Add CSRF trusted origins for Render
+CSRF_TRUSTED_ORIGINS = [
+    'https://store-marketing-survey.onrender.com',
+    'https://*.onrender.com',
 ]
 
 ROOT_URLCONF = 'config.urls'
