@@ -291,8 +291,8 @@ export async function POST(request: NextRequest) {
 
     // 추가적으로 JSON 파일로도 저장 (옵션)
     if (process.env.SAVE_TO_FILE === 'true') {
-      const fs = require('fs').promises;
-      const path = require('path');
+      const { promises: fs } = await import('fs');
+      const path = await import('path');
       
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `survey_${surveyData.storeName}_${timestamp}.json`;

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readdir, readFile } from 'fs/promises';
 import path from 'path';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // 저장된 설문조사 파일들을 읽어오기
     const surveysDir = path.join(process.cwd(), 'surveys');
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
         count: validSurveys.length,
       });
       
-    } catch (dirError) {
+    } catch {
       // surveys 디렉토리가 없는 경우 빈 배열 반환
       console.log('No surveys directory found');
       return NextResponse.json({
