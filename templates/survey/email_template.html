@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        h2 { color: #007bff; margin-top: 30px; }
+        .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .info-table th, .info-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        .info-table th { background-color: #f8f9fa; font-weight: bold; width: 30%; }
+        .status-yes { color: #28a745; font-weight: bold; }
+        .status-no { color: #dc3545; font-weight: bold; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 SNS마케팅 건강 진단표 결과</h1>
+        <p style="font-weight: bold;">청운대학교 정현우 책임교수 주관 | 마케팅 지원: (주)위즈더플래닝</p>
+        <p>작성일시: {{ survey.created_at|date:"Y년 m월 d일 H:i" }}</p>
+        
+        <h2>기본 정보</h2>
+        <table class="info-table">
+            <tr><th>매장명</th><td>{{ survey.store_name }}</td></tr>
+            <tr><th>대표자명</th><td>{{ survey.owner_name }}</td></tr>
+            <tr><th>연락처</th><td>{{ survey.phone_number }}</td></tr>
+            <tr><th>이메일</th><td>{{ survey.email }}</td></tr>
+        </table>
+        
+        <h2>매장 정보</h2>
+        <table class="info-table">
+            <tr><th>업종</th><td>{{ survey.get_business_type_display }}{% if survey.business_type_other %} ({{ survey.business_type_other }}){% endif %}</td></tr>
+            <tr><th>매장 규모</th><td>{{ survey.get_store_size_display }}</td></tr>
+            <tr><th>상권 위치</th><td>{{ survey.get_location_type_display }}</td></tr>
+            {% if survey.location_detail %}<tr><th>상세 위치</th><td>{{ survey.location_detail }}</td></tr>{% endif %}
+        </table>
+        
+        <h2>네이버 플레이스 마케팅 현황</h2>
+        <table class="info-table">
+            <tr><th>등록 여부</th><td>{% if survey.naver_registered %}<span class="status-yes">✅ 등록됨</span>{% else %}<span class="status-no">❌ 미등록</span>{% endif %}</td></tr>
+            <tr><th>사진 매력도</th><td>{{ survey.naver_photos_quality }}/5점</td></tr>
+            <tr><th>예약 기능</th><td>{% if survey.naver_reservation %}<span class="status-yes">✅ 활용중</span>{% else %}<span class="status-no">❌ 미활용</span>{% endif %}</td></tr>
+            <tr><th>소식 업데이트</th><td>{{ survey.get_naver_news_update_display }}</td></tr>
+            <tr><th>찾아오는 길</th><td>{% if survey.naver_directions %}<span class="status-yes">✅ 상세 설명</span>{% else %}<span class="status-no">❌ 미작성</span>{% endif %}</td></tr>
+            <tr><th>마케팅 메시지</th><td>{% if survey.naver_marketing_msg %}<span class="status-yes">✅ 활용중</span>{% else %}<span class="status-no">❌ 미활용</span>{% endif %}</td></tr>
+            <tr><th>키워드 SEO</th><td>{% if survey.naver_keywords %}<span class="status-yes">✅ 최적화</span>{% else %}<span class="status-no">❌ 미최적화</span>{% endif %}</td></tr>
+            <tr><th>클립 영상</th><td>{% if survey.naver_video_clip %}<span class="status-yes">✅ 활용중</span>{% else %}<span class="status-no">❌ 미활용</span>{% endif %}</td></tr>
+            <tr><th>통계 분석</th><td>{% if survey.naver_statistics %}<span class="status-yes">✅ 확인중</span>{% else %}<span class="status-no">❌ 미확인</span>{% endif %}</td></tr>
+        </table>
+        
+        <h2>인스타그램 마케팅 현황</h2>
+        <table class="info-table">
+            <tr><th>검색 노출</th><td>{% if survey.instagram_searchable %}<span class="status-yes">✅ 노출됨</span>{% else %}<span class="status-no">❌ 미노출</span>{% endif %}</td></tr>
+            <tr><th>영상 개수</th><td>{{ survey.instagram_video_count }}개</td></tr>
+            <tr><th>후기 존재</th><td>{% if survey.instagram_has_reviews %}<span class="status-yes">✅ 있음</span>{% else %}<span class="status-no">❌ 없음</span>{% endif %}</td></tr>
+        </table>
+        
+        <h2>체험단 마케팅 현황</h2>
+        <table class="info-table">
+            <tr><th>최신 콘텐츠</th><td>{% if survey.blog_content_recent %}<span class="status-yes">✅ 최신</span>{% else %}<span class="status-no">❌ 오래됨</span>{% endif %}</td></tr>
+            <tr><th>상세 정보</th><td>{% if survey.blog_detailed_info %}<span class="status-yes">✅ 포함</span>{% else %}<span class="status-no">❌ 미포함</span>{% endif %}</td></tr>
+        </table>
+        
+        <h2>구글 마케팅 현황</h2>
+        <table class="info-table">
+            <tr><th>비즈니스 등록</th><td>{% if survey.google_registered %}<span class="status-yes">✅ 등록됨</span>{% else %}<span class="status-no">❌ 미등록</span>{% endif %}</td></tr>
+            <tr><th>정보 정확도</th><td>{% if survey.google_info_accurate %}<span class="status-yes">✅ 정확</span>{% else %}<span class="status-no">❌ 부정확</span>{% endif %}</td></tr>
+        </table>
+        
+        <h2>유료 광고 현황</h2>
+        <table class="info-table">
+            <tr><th>네이버 플레이스 광고</th><td>{% if survey.ad_naver_place %}<span class="status-yes">✅ 진행중</span>{% else %}<span class="status-no">❌ 미진행</span>{% endif %}{% if survey.ad_naver_place_budget %} (예산: {{ survey.ad_naver_place_budget }}){% endif %}</td></tr>
+            <tr><th>네이버 파워링크</th><td>{% if survey.ad_naver_powerlink %}<span class="status-yes">✅ 진행중</span>{% else %}<span class="status-no">❌ 미진행</span>{% endif %}{% if survey.ad_naver_powerlink_budget %} (예산: {{ survey.ad_naver_powerlink_budget }}){% endif %}</td></tr>
+            <tr><th>인스타 릴스 광고</th><td>{% if survey.ad_instagram_reels %}<span class="status-yes">✅ 진행중</span>{% else %}<span class="status-no">❌ 미진행</span>{% endif %}{% if survey.ad_instagram_budget %} (예산: {{ survey.ad_instagram_budget }}){% endif %}</td></tr>
+        </table>
+        
+        <h2>마케팅 대행사 이용 경험</h2>
+        <table class="info-table">
+            <tr><th>대행사 이용 경험</th><td>{% if survey.used_marketing_agency %}<span class="status-yes">✅ 있음</span>{% else %}<span class="status-no">❌ 없음</span>{% endif %}</td></tr>
+            {% if survey.agency_satisfaction %}<tr><th>대행사 만족도</th><td>{{ survey.get_agency_satisfaction_display }}</td></tr>{% endif %}
+            {% if survey.agency_service_detail %}<tr><th>이용 서비스</th><td>{{ survey.agency_service_detail }}</td></tr>{% endif %}
+        </table>
+        
+        {% if survey.main_concerns %}
+        <h2>주요 고민사항</h2>
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+            {{ survey.main_concerns|linebreaks }}
+        </div>
+        {% endif %}
+        
+        {% if survey.desired_improvements %}
+        <h2>개선 희망사항</h2>
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+            {{ survey.desired_improvements|linebreaks }}
+        </div>
+        {% endif %}
+        
+        <div class="footer">
+            <p>이 이메일은 SNS마케팅 건강 진단표 시스템에서 자동으로 발송되었습니다.</p>
+            <p>청운대학교 정현우 책임교수 주관 | 마케팅 지원: (주)위즈더플래닝</p>
+        </div>
+    </div>
+</body>
+</html>
