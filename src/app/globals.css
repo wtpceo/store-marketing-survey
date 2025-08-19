@@ -48,3 +48,38 @@ select:-ms-input-placeholder {
   color: #6b7280 !important;
   opacity: 1 !important;
 }
+
+/* 드롭다운 메뉴 옵션 색상 개선 */
+select {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+}
+
+select option {
+  color: #374151 !important;
+  background-color: #ffffff !important;
+  padding: 8px 12px;
+}
+
+select option:hover,
+select option:focus {
+  background-color: #f3f4f6 !important;
+  color: #111827 !important;
+}
+
+select option:checked {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* 입력 필드 텍스트 색상 강화 */
+input,
+textarea {
+  color: #374151 !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  color: #111827 !important;
+}
