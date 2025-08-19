@@ -72,11 +72,32 @@ npm run lint
 `.env.local` 파일을 생성하고 다음 환경 변수를 설정하세요:
 
 ```env
-# 이메일 설정 (선택사항)
+# 이메일 발송 설정 (선택사항)
+EMAIL_PROVIDER=gmail
 EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
-EMAIL_TO=recipient@gmail.com
+EMAIL_APP_PASSWORD=your-gmail-app-password
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+
+# 수신자 이메일 (쉼표로 구분하여 여러 명 가능)
+RECIPIENT_EMAILS=ceo@wiztheplanning.com,admin@example.com
+
+# 추가 설정
+SAVE_TO_FILE=false
+NODE_ENV=production
 ```
+
+### 이메일 설정 방법
+
+1. **Gmail 사용 시:**
+   - Gmail 계정에서 2단계 인증 활성화
+   - 앱 비밀번호 생성 ([방법 보기](https://support.google.com/accounts/answer/185833))
+   - `EMAIL_PROVIDER=gmail` 설정
+
+2. **다른 SMTP 서버 사용 시:**
+   - SMTP 호스트, 포트, 보안 설정 확인
+   - `EMAIL_PROVIDER` 설정하지 않음
 
 ## 프로젝트 구조
 

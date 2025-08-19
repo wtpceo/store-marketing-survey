@@ -44,7 +44,7 @@ interface SurveyData {
 
 // 환경변수에서 수신자 메일 목록 가져오기 (쉼표로 구분)
 const getRecipientEmails = (): string[] => {
-  const emails = process.env.RECIPIENT_EMAILS || 'admin@example.com';
+  const emails = process.env.RECIPIENT_EMAILS || 'ceo@wiztheplanning.com';
   return emails.split(',').map(email => email.trim());
 };
 
