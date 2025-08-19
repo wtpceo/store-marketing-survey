@@ -59,14 +59,14 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching surveys:', error);
     
-    return NextResponse.json(
-      {
-        success: false,
-        message: '설문조사 목록을 불러오는 중 오류가 발생했습니다.',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-      },
-      { status: 500 }
-    );
+          return NextResponse.json(
+        {
+          success: false,
+          message: '설문조사 목록을 불러오는 중 오류가 발생했습니다.',
+          error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+        },
+        { status: 500 }
+      );
   }
 }
 
@@ -97,13 +97,13 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Error deleting survey:', error);
     
-    return NextResponse.json(
-      {
-        success: false,
-        message: '설문조사 삭제 중 오류가 발생했습니다.',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-      },
-      { status: 500 }
-    );
+          return NextResponse.json(
+        {
+          success: false,
+          message: '설문조사 삭제 중 오류가 발생했습니다.',
+          error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+        },
+        { status: 500 }
+      );
   }
 }

@@ -52,7 +52,7 @@ const getRecipientEmails = (): string[] => {
 const createTransporter = () => {
   // Gmail을 사용하는 경우
   if (process.env.EMAIL_PROVIDER === 'gmail') {
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
@@ -62,7 +62,7 @@ const createTransporter = () => {
   }
   
   // SMTP 서버를 직접 사용하는 경우
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
     secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
@@ -317,13 +317,13 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Survey submission error:', error);
     
-    return NextResponse.json(
-      {
-        success: false,
-        message: '설문조사 제출 중 오류가 발생했습니다.',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-      },
-      { status: 500 }
-    );
+          return NextResponse.json(
+        {
+          success: false,
+          message: '설문조사 제출 중 오류가 발생했습니다.',
+          error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+        },
+        { status: 500 }
+      );
   }
 }
