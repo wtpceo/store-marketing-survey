@@ -8,9 +8,9 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = False
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='store-marketing-survey.onrender.com,localhost', cast=lambda v: [s.strip() for s in v.split(',')])
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-temporary-key-change-in-production')
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = ['store-marketing-survey.onrender.com', 'localhost', '127.0.0.1', '.onrender.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
