@@ -264,66 +264,78 @@ export async function POST(request: NextRequest) {
   try {
     const surveyData: SurveyData = await request.json();
 
-    // 환경 변수 체크
-    if (!process.env.EMAIL_USER) {
-      console.log('Warning: EMAIL_USER not configured. Survey data logged to console.');
-      console.log('Survey Data:', JSON.stringify(surveyData, null, 2));
-      
-      return NextResponse.json({
-        success: true,
-        message: '설문조사가 접수되었습니다. (개발 모드: 콘솔 로그 확인)',
-      });
+    // 항상 설문 데이터를 콘솔에 로그 (백업용)
+    console.log('Survey Data Received:', JSON.stringify(surveyData, null, 2));
+
+    let emailSent = false;
+    let emailError = null;
+
+    // 이메일 발송 시도 (실패해도 설문은 성공으로 처리)
+    if (process.env.EMAIL_USER) {
+      try {
+        const transporter = createTransporter();
+        const recipients = getRecipientEmails();
+        const htmlContent = createEmailTemplate(surveyData);
+
+        const mailOptions = {
+          from: `"마케팅 컨설팅 설문조사" <${process.env.EMAIL_USER}>`,
+          to: recipients.join(', '),
+          subject: `[신규 설문] ${surveyData.storeName} - 마케팅 컨설팅 설문조사 결과`,
+          html: htmlContent,
+        };
+
+        await transporter.sendMail(mailOptions);
+        emailSent = true;
+        console.log('Email sent successfully to:', recipients.join(', '));
+      } catch (error) {
+        emailError = error;
+        console.error('Email sending failed:', error);
+        console.log('Survey data preserved despite email failure');
+      }
+    } else {
+      console.log('EMAIL_USER not configured. Skipping email sending.');
     }
 
-    // 이메일 발송
-    const transporter = createTransporter();
-    const recipients = getRecipientEmails();
-    const htmlContent = createEmailTemplate(surveyData);
-
-    const mailOptions = {
-      from: `"마케팅 컨설팅 설문조사" <${process.env.EMAIL_USER}>`,
-      to: recipients.join(', '),
-      subject: `[신규 설문] ${surveyData.storeName} - 마케팅 컨설팅 설문조사 결과`,
-      html: htmlContent,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    // 추가적으로 JSON 파일로도 저장 (옵션)
+    // JSON 파일 저장 시도 (선택사항)
     if (process.env.SAVE_TO_FILE === 'true') {
-      const { promises: fs } = await import('fs');
-      const path = await import('path');
-      
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `survey_${surveyData.storeName}_${timestamp}.json`;
-      const surveysDir = path.join(process.cwd(), 'surveys');
-      
       try {
+        const { promises: fs } = await import('fs');
+        const path = await import('path');
+        
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `survey_${surveyData.storeName}_${timestamp}.json`;
+        const surveysDir = path.join(process.cwd(), 'surveys');
+        
         await fs.mkdir(surveysDir, { recursive: true });
         await fs.writeFile(
           path.join(surveysDir, filename),
           JSON.stringify(surveyData, null, 2)
         );
+        console.log('Survey data saved to file:', filename);
       } catch (fileError) {
         console.error('File save error:', fileError);
       }
     }
 
+    // 설문은 항상 성공으로 처리 (이메일 실패와 관계없이)
     return NextResponse.json({
       success: true,
-      message: '설문조사가 성공적으로 제출되었습니다.',
+      message: emailSent 
+        ? '설문조사가 성공적으로 제출되었습니다.' 
+        : '설문조사가 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.',
+      emailSent,
     });
 
   } catch (error) {
     console.error('Survey submission error:', error);
     
-          return NextResponse.json(
-        {
-          success: false,
-          message: '설문조사 제출 중 오류가 발생했습니다.',
-          error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
-        },
-        { status: 500 }
-      );
+    return NextResponse.json(
+      {
+        success: false,
+        message: '설문조사 제출 중 오류가 발생했습니다. 다시 시도해주세요.',
+        error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+      },
+      { status: 500 }
+    );
   }
 }
