@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface SurveyResult {
   id: string;
@@ -50,6 +50,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
   // 간단한 비밀번호 인증 (실제 프로덕션에서는 더 안전한 인증 방식 사용)
   const handleLogin = () => {
@@ -128,6 +130,93 @@ export default function AdminPage() {
     return Math.round((score / (total * 2)) * 100);
   };
 
+  // 자동 새로고침 기능
+  useEffect(() => {
+    if (autoRefresh && isAuthenticated) {
+      const interval = setInterval(() => {
+        loadSurveyResults();
+      }, 30000); // 30초마다 새로고침
+      return () => clearInterval(interval);
+    }
+  }, [autoRefresh, isAuthenticated]);
+
+  // 검색 필터링
+  const filteredResults = surveyResults.filter(result =>
+    result.storeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    result.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    result.storeType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    result.businessArea.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // 통계 계산
+  const getStatistics = () => {
+    if (surveyResults.length === 0) return { total: 0, avgScore: 0, highScore: 0, lowScore: 0 };
+    
+    const scores = surveyResults.map(result => getMarketingScore(result));
+    const avgScore = Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+    const highScore = Math.max(...scores);
+    const lowScore = Math.min(...scores);
+    
+    return {
+      total: surveyResults.length,
+      avgScore,
+      highScore,
+      lowScore
+    };
+  };
+
+  // 엑셀 다운로드 기능
+  const downloadExcel = () => {
+    const data = surveyResults.map(result => ({
+      '제출일시': formatDate(result.submittedAt),
+      '매장명': result.storeName,
+      '업종': result.storeType,
+      '상권': result.businessArea,
+      '규모': result.storeSize,
+      '사장님': result.ownerName,
+      '연락처': result.phoneNumber,
+      '이메일': result.email || '',
+      '마케팅점수': getMarketingScore(result) + '%',
+      '네이버플레이스_사진등재': result.naverPlace.attractivePhotos,
+      '네이버플레이스_예약기능': result.naverPlace.reservationFeature,
+      '네이버플레이스_매장소식': result.naverPlace.regularNews,
+      '네이버플레이스_찾아오는길': result.naverPlace.detailedDirections,
+      '네이버플레이스_마케팅메시지': result.naverPlace.freeMarketingMessage,
+      '네이버플레이스_SEO최적화': result.naverPlace.seoOptimization,
+      '네이버플레이스_클립영상': result.naverPlace.clipVideo,
+      '네이버플레이스_통계분석': result.naverPlace.statisticsAnalysis,
+      '인스타그램_검색노출': result.instagram.searchableContent,
+      '인스타그램_영상개수': result.instagram.videoCount,
+      '인스타그램_고객후기': result.instagram.reviews,
+      '블로그마케팅_최신콘텐츠': result.blogMarketing.latestContent,
+      '블로그마케팅_상세정보': result.blogMarketing.detailedInfo,
+      '구글_정보정확성': result.google.accurateInfo,
+      '유료광고_네이버플레이스광고': result.paidAds.naverPlaceAds,
+      '유료광고_네이버플레이스예산': result.paidAds.naverPlaceAdsBudget || '',
+      '유료광고_네이버파워링크': result.paidAds.naverPowerlink,
+      '유료광고_네이버파워링크예산': result.paidAds.naverPowerlinkBudget || '',
+      '유료광고_인스타그램릴스': result.paidAds.instagramReels,
+      '유료광고_인스타그램릴스예산': result.paidAds.instagramReelsBudget || '',
+    }));
+
+    const csvContent = [
+      Object.keys(data[0]).join(','),
+      ...data.map(row => Object.values(row).map(value => `"${value}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `설문조사결과_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const stats = getStatistics();
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -159,12 +248,75 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">설문조사 결과 관리</h1>
-          <button
-            onClick={() => setIsAuthenticated(false)}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-          >
-            로그아웃
-          </button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="autoRefresh"
+                checked={autoRefresh}
+                onChange={(e) => setAutoRefresh(e.target.checked)}
+                className="rounded"
+              />
+              <label htmlFor="autoRefresh" className="text-sm text-gray-600">자동새로고침 (30초)</label>
+            </div>
+            <button
+              onClick={() => setIsAuthenticated(false)}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              로그아웃
+            </button>
+          </div>
+        </div>
+
+        {/* 통계 대시보드 */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="text-2xl">📊</div>
+              </div>
+              <div className="ml-4">
+                <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
+                <div className="text-sm text-gray-600">총 설문 수</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-green-50 p-6 rounded-lg border border-green-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="text-2xl">📈</div>
+              </div>
+              <div className="ml-4">
+                <div className="text-2xl font-bold text-green-600">{stats.avgScore}%</div>
+                <div className="text-sm text-gray-600">평균 점수</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="text-2xl">🏆</div>
+              </div>
+              <div className="ml-4">
+                <div className="text-2xl font-bold text-yellow-600">{stats.highScore}%</div>
+                <div className="text-sm text-gray-600">최고 점수</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="text-2xl">⚡</div>
+              </div>
+              <div className="ml-4">
+                <div className="text-2xl font-bold text-purple-600">{stats.lowScore}%</div>
+                <div className="text-sm text-gray-600">최저 점수</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {loading ? (
@@ -177,20 +329,42 @@ export default function AdminPage() {
             {/* 설문 결과 목록 */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">설문 결과 목록 ({surveyResults.length}건)</h2>
-                <button
-                  onClick={loadSurveyResults}
-                  className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors"
-                >
-                  새로고침
-                </button>
+                <h2 className="text-xl font-semibold">설문 결과 목록 ({filteredResults.length}/{surveyResults.length}건)</h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={downloadExcel}
+                    disabled={surveyResults.length === 0}
+                    className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    📊 엑셀 다운로드
+                  </button>
+                  <button
+                    onClick={loadSurveyResults}
+                    className="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors"
+                  >
+                    🔄 새로고침
+                  </button>
+                </div>
+              </div>
+              
+              {/* 검색 기능 */}
+              <div className="mb-4">
+                <input
+                  type="text"
+                  placeholder="매장명, 사장님, 업종, 상권으로 검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
               
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {surveyResults.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">설문 결과가 없습니다.</p>
+                ) : filteredResults.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">검색 결과가 없습니다.</p>
                 ) : (
-                  surveyResults.map((result) => (
+                  filteredResults.map((result) => (
                     <div
                       key={result.id}
                       onClick={() => setSelectedResult(result)}
