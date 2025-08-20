@@ -829,25 +829,10 @@ export default function Home() {
                 제출하신 정보는 매장 맞춤 마케팅 컨설팅에 활용됩니다.
               </p>
               <div className="bg-blue-50 p-6 rounded-lg mb-6">
-                <p className="text-blue-800 font-medium mb-4">
+                <p className="text-blue-800 font-medium">
                   담당자가 검토 후 연락드리겠습니다.<br/>
                   추가 문의사항이 있으시면 언제든 연락해주세요.
                 </p>
-                
-                {/* 카카오톡 문의 버튼 */}
-                <div className="flex justify-center">
-                  <a
-                    href="http://pf.kakao.com/_QUTxcb/chat"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-800 rounded-lg font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
-                  >
-                    <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 3c-4.97 0-9 3.41-9 7.61 0 2.47 1.21 4.67 3.12 6.09l-.52 2.78c-.06.32.2.58.52.52l3.48-.65c.85.18 1.74.27 2.65.27 4.97 0 9-3.41 9-7.61S16.97 3 12 3z"/>
-                    </svg>
-                    <span>카카오톡으로 문의하기</span>
-                  </a>
-                </div>
               </div>
               
               {/* 주관 및 지원 기관 정보 */}
@@ -912,29 +897,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 px-4">
       <div className="max-w-3xl mx-auto">
         
-        {/* 실시간 문의 플로팅 버튼 */}
-        <div className="fixed bottom-6 right-6 z-50">
-          <a
-            href="http://pf.kakao.com/_QUTxcb/chat"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group flex items-center bg-yellow-400 hover:bg-yellow-500 text-gray-800 px-4 py-3 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 font-medium"
-          >
-            <div className="flex items-center">
-              <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3c-4.97 0-9 3.41-9 7.61 0 2.47 1.21 4.67 3.12 6.09l-.52 2.78c-.06.32.2.58.52.52l3.48-.65c.85.18 1.74.27 2.65.27 4.97 0 9-3.41 9-7.61S16.97 3 12 3z"/>
-              </svg>
-              <span className="hidden sm:block">실시간 문의</span>
-              <span className="sm:hidden">문의</span>
-            </div>
-            
-            {/* 펄스 애니메이션 */}
-            <div className="absolute -top-1 -right-1 w-3 h-3">
-              <div className="absolute w-full h-full bg-red-500 rounded-full animate-ping"></div>
-              <div className="absolute w-full h-full bg-red-500 rounded-full"></div>
-            </div>
-          </a>
-        </div>
+
         {/* 헤더 */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 backdrop-blur-sm">
           {/* 주관 기관 정보 */}
