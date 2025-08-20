@@ -1,0 +1,39 @@
+{
+  "storeName": "테스트카페",
+  "storeType": "카페",
+  "businessArea": "대학가",
+  "storeSize": "20-30평",
+  "ownerName": "123",
+  "phoneNumber": "123123412341",
+  "email": "",
+  "naverPlace": {
+    "attractivePhotos": "매우 잘 되어있음",
+    "reservationFeature": "가끔 사용",
+    "regularNews": "주 3회 이상",
+    "detailedDirections": "부족함",
+    "freeMarketingMessage": "적극 활용",
+    "seoOptimization": "부족함",
+    "clipVideo": "만들 예정",
+    "statisticsAnalysis": "확인 방법 모름"
+  },
+  "instagram": {
+    "searchableContent": "조금 있음",
+    "videoCount": "10개 이상",
+    "reviews": "많이 있음"
+  },
+  "blogMarketing": {
+    "latestContent": "최근 6개월 내",
+    "detailedInfo": "매우 상세함"
+  },
+  "google": {
+    "accurateInfo": "대부분 정확함"
+  },
+  "paidAds": {
+    "naverPlaceAds": "과거에 했음",
+    "naverPlaceAdsBudget": "100만원 이상",
+    "naverPowerlink": "현재 진행중",
+    "naverPowerlinkBudget": "10만원 미만",
+    "instagramReels": "과거에 했음",
+    "instagramReelsBudget": "50-100만원"
+  }
+}
