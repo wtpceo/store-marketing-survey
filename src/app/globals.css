@@ -83,3 +83,126 @@ textarea:focus,
 select:focus {
   color: #111827 !important;
 }
+
+/* iOS Safari 라디오/체크박스 라벨 텍스트 색상 강화 */
+label {
+  color: #374151 !important;
+}
+
+/* 라디오 버튼 컨테이너의 텍스트 색상 강화 (iOS Safari 대응) */
+.peer + label,
+.peer-checked + label,
+label[for] {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
+/* 라디오 버튼 선택 시 텍스트 색상 더 진하게 */
+.peer:checked + label {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+/* iOS Safari의 웹킷 특별 처리 */
+@supports (-webkit-appearance: none) {
+  label,
+  .peer + label,
+  .peer-checked + label {
+    color: #1f2937 !important;
+    -webkit-text-fill-color: #1f2937 !important;
+    text-shadow: none !important;
+  }
+}
+
+/* iOS Safari 다크모드에서의 텍스트 가독성 */
+@media (prefers-color-scheme: dark) {
+  label,
+  .peer + label,
+  .peer-checked + label {
+    color: #f9fafb !important;
+    -webkit-text-fill-color: #f9fafb !important;
+  }
+}
+
+/* 모든 텍스트 요소에 대한 iOS Safari 강제 색상 적용 */
+div, span, p, h1, h2, h3, h4, h5, h6 {
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* 라디오 버튼과 체크박스를 위한 iOS Safari 특별 처리 */
+input[type="radio"] + span,
+input[type="checkbox"] + span,
+label span {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+  font-weight: 500 !important;
+}
+
+/* 라디오 버튼 선택 시 스타일 */
+input[type="radio"]:checked + span,
+input[type="checkbox"]:checked + span {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  font-weight: 600 !important;
+}
+
+/* iOS 전용 강제 텍스트 색상 */
+@supports (-webkit-touch-callout: none) {
+  span, label, div {
+    color: #1f2937 !important;
+    -webkit-text-fill-color: #1f2937 !important;
+  }
+  
+  /* 라디오 버튼 텍스트 더 진하게 */
+  label span {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    text-shadow: none !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* 라디오 버튼 자체 스타일링 개선 (iOS Safari 대응) */
+input[type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 50%;
+  background-color: #ffffff;
+  margin-right: 12px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+input[type="radio"]:checked {
+  border-color: #3b82f6;
+  background-color: #3b82f6;
+}
+
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ffffff;
+}
+
+/* 라디오 버튼 포커스 스타일 */
+input[type="radio"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 라디오 버튼 호버 효과 */
+input[type="radio"]:hover {
+  border-color: #3b82f6;
+}
