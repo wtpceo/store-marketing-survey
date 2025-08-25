@@ -56,6 +56,7 @@ interface SurveyData {
 
 export default function Home() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [surveyResults, setSurveyResults] = useState<any>(null);
   const [surveyData, setSurveyData] = useState<SurveyData>({
     storeName: '',
     storeType: '',
@@ -135,14 +136,190 @@ export default function Home() {
     }
   };
 
+  // 점수 계산 시스템
+  const calculateScore = (data: SurveyData) => {
+    let scores = {
+      naverPlace: 0,
+      instagram: 0,
+      blogMarketing: 0,
+      google: 0,
+      paidAds: 0,
+      total: 0
+    };
+
+    // 네이버 플레이스 점수 계산 (최대 40점)
+    const naverScoring = {
+      attractivePhotos: { '여러 장 있음': 5, '몇 장 있음': 3, '1-2장 있음': 2, '없음': 0, '모르겠음': 1 },
+      reservationFeature: { '사용 중': 5, '설정했지만 미사용': 3, '설정 예정': 2, '관심 없음': 0, '모르겠음': 1 },
+      regularNews: { '정기적으로 등록': 5, '가끔 등록': 3, '거의 안함': 1, '전혀 안함': 0, '모르겠음': 1 },
+      detailedDirections: { '자세히 작성': 5, '간단히 작성': 3, '기본 정보만': 2, '작성 안함': 0, '모르겠음': 1 },
+      freeMarketingMessage: { '적극 활용': 5, '가끔 활용': 3, '거의 안함': 1, '전혀 안함': 0, '모르겠음': 1 },
+      seoOptimization: { '최적화 완료': 5, '부분 최적화': 3, '계획 중': 2, '관심 없음': 0, '모르겠음': 1 },
+      clipVideo: { '여러 개 있음': 5, '1-2개 있음': 3, '만들 예정': 2, '없음': 0, '모르겠음': 1 },
+      statisticsAnalysis: { '정기적으로 확인': 5, '가끔 확인': 3, '확인 방법 모름': 1, '관심 없음': 0, '모르겠음': 1 }
+    };
+
+    Object.entries(data.naverPlace).forEach(([key, value]) => {
+      if (naverScoring[key as keyof typeof naverScoring] && value) {
+        scores.naverPlace += naverScoring[key as keyof typeof naverScoring][value as keyof typeof naverScoring[keyof typeof naverScoring]] || 0;
+      }
+    });
+
+    // 인스타그램 점수 계산 (최대 15점)
+    const instagramScoring = {
+      searchableContent: { '매우 많음': 5, '보통': 3, '적음': 2, '거의 없음': 0, '모르겠음': 1 },
+      videoCount: { '매우 많음': 5, '보통': 3, '적음': 2, '거의 없음': 0, '모르겠음': 1 },
+      reviews: { '매우 많음': 5, '보통': 3, '적음': 2, '거의 없음': 0, '모르겠음': 1 }
+    };
+
+    Object.entries(data.instagram).forEach(([key, value]) => {
+      if (instagramScoring[key as keyof typeof instagramScoring] && value) {
+        scores.instagram += instagramScoring[key as keyof typeof instagramScoring][value as keyof typeof instagramScoring[keyof typeof instagramScoring]] || 0;
+      }
+    });
+
+    // 블로그 마케팅 점수 계산 (최대 10점)
+    const blogScoring = {
+      latestContent: { '최근 1개월': 5, '최근 3개월': 3, '최근 6개월': 2, '6개월 이상': 0, '모르겠음': 1 },
+      detailedInfo: { '매우 자세함': 5, '보통': 3, '간단함': 2, '거의 없음': 0, '모르겠음': 1 }
+    };
+
+    Object.entries(data.blogMarketing).forEach(([key, value]) => {
+      if (blogScoring[key as keyof typeof blogScoring] && value) {
+        scores.blogMarketing += blogScoring[key as keyof typeof blogScoring][value as keyof typeof blogScoring[keyof typeof blogScoring]] || 0;
+      }
+    });
+
+    // 구글 마케팅 점수 계산 (최대 5점)
+    const googleScoring = {
+      accurateInfo: { '매우 정확': 5, '대체로 정확': 3, '부분적으로 정확': 2, '부정확': 0, '모르겠음': 1 }
+    };
+
+    if (data.google.accurateInfo && googleScoring.accurateInfo[data.google.accurateInfo as keyof typeof googleScoring.accurateInfo]) {
+      scores.google = googleScoring.accurateInfo[data.google.accurateInfo as keyof typeof googleScoring.accurateInfo];
+    }
+
+    // 유료 광고 점수 계산 (최대 30점) - 사용 여부와 예산에 따라
+    const paidAdsScoring = {
+      naverPlaceAds: { '적극 활용': 5, '가끔 활용': 3, '시도해본 적 있음': 2, '관심 없음': 0, '모르겠음': 1 },
+      naverPowerlink: { '적극 활용': 5, '가끔 활용': 3, '시도해본 적 있음': 2, '관심 없음': 0, '모르겠음': 1 },
+      instagramReels: { '적극 활용': 5, '가끔 활용': 3, '시도해본 적 있음': 2, '관심 없음': 0, '모르겠음': 1 }
+    };
+
+    const budgetScoring = {
+      '월 100만원 이상': 5,
+      '월 50-100만원': 4,
+      '월 20-50만원': 3,
+      '월 10-20만원': 2,
+      '월 10만원 미만': 1,
+      '예산 없음': 0,
+      '모르겠음': 1
+    };
+
+    // 네이버 플레이스 광고
+    if (data.paidAds.naverPlaceAds && paidAdsScoring.naverPlaceAds[data.paidAds.naverPlaceAds as keyof typeof paidAdsScoring.naverPlaceAds]) {
+      scores.paidAds += paidAdsScoring.naverPlaceAds[data.paidAds.naverPlaceAds as keyof typeof paidAdsScoring.naverPlaceAds];
+      if (data.paidAds.naverPlaceAdsBudget && budgetScoring[data.paidAds.naverPlaceAdsBudget as keyof typeof budgetScoring]) {
+        scores.paidAds += budgetScoring[data.paidAds.naverPlaceAdsBudget as keyof typeof budgetScoring];
+      }
+    }
+
+    // 네이버 파워링크
+    if (data.paidAds.naverPowerlink && paidAdsScoring.naverPowerlink[data.paidAds.naverPowerlink as keyof typeof paidAdsScoring.naverPowerlink]) {
+      scores.paidAds += paidAdsScoring.naverPowerlink[data.paidAds.naverPowerlink as keyof typeof paidAdsScoring.naverPowerlink];
+      if (data.paidAds.naverPowerlinkBudget && budgetScoring[data.paidAds.naverPowerlinkBudget as keyof typeof budgetScoring]) {
+        scores.paidAds += budgetScoring[data.paidAds.naverPowerlinkBudget as keyof typeof budgetScoring];
+      }
+    }
+
+    // 인스타그램 릴스 광고
+    if (data.paidAds.instagramReels && paidAdsScoring.instagramReels[data.paidAds.instagramReels as keyof typeof paidAdsScoring.instagramReels]) {
+      scores.paidAds += paidAdsScoring.instagramReels[data.paidAds.instagramReels as keyof typeof paidAdsScoring.instagramReels];
+      if (data.paidAds.instagramReelsBudget && budgetScoring[data.paidAds.instagramReelsBudget as keyof typeof budgetScoring]) {
+        scores.paidAds += budgetScoring[data.paidAds.instagramReelsBudget as keyof typeof budgetScoring];
+      }
+    }
+
+    // 총점 계산 (100점 만점)
+    scores.total = scores.naverPlace + scores.instagram + scores.blogMarketing + scores.google + scores.paidAds;
+
+    return scores;
+  };
+
+  // 피드백 생성 함수
+  const generateFeedback = (scores: any, data: SurveyData) => {
+    const { total, naverPlace, instagram, blogMarketing, google, paidAds } = scores;
+    
+    let grade = '';
+    let overallFeedback = '';
+    let recommendations: string[] = [];
+
+    // 등급 및 전체 평가
+    if (total >= 80) {
+      grade = 'A';
+      overallFeedback = '🎉 우수한 SNS 마케팅 활용도를 보이고 있습니다! 현재 수준을 유지하면서 세부적인 최적화에 집중하세요.';
+    } else if (total >= 60) {
+      grade = 'B';
+      overallFeedback = '👍 양호한 마케팅 활용도입니다. 일부 영역에서 개선이 필요하지만 전반적으로 좋은 방향입니다.';
+    } else if (total >= 40) {
+      grade = 'C';
+      overallFeedback = '⚠️ 보통 수준의 마케팅 활용도입니다. 몇 가지 핵심 영역에서 집중적인 개선이 필요합니다.';
+    } else if (total >= 20) {
+      grade = 'D';
+      overallFeedback = '📢 마케팅 활용도가 낮습니다. 기본적인 온라인 마케팅부터 시작하여 단계적으로 개선하세요.';
+    } else {
+      grade = 'F';
+      overallFeedback = '🚨 SNS 마케팅 활용이 매우 부족합니다. 전문가 상담을 통한 체계적인 마케팅 전략 수립이 필요합니다.';
+    }
+
+    // 영역별 개선 제안
+    if (naverPlace < 25) {
+      recommendations.push('🏪 네이버 플레이스: 매력적인 사진 업로드, 정기적인 소식 등록, 예약 기능 활용을 우선적으로 개선하세요.');
+    }
+    if (instagram < 10) {
+      recommendations.push('📸 인스타그램: 검색 가능한 콘텐츠와 릴스 영상을 늘리고, 고객 리뷰를 적극 유도하세요.');
+    }
+    if (blogMarketing < 6) {
+      recommendations.push('✍️ 블로그 마케팅: 최근 콘텐츠 업데이트와 상세한 매장 정보 제공에 집중하세요.');
+    }
+    if (google < 3) {
+      recommendations.push('🌐 구글 마케팅: 구글 마이 비즈니스 정보를 정확하고 상세하게 업데이트하세요.');
+    }
+    if (paidAds < 15 && total > 40) {
+      recommendations.push('💰 유료 광고: 안정적인 기본 마케팅을 바탕으로 효과적인 유료 광고 운영을 고려해보세요.');
+    }
+
+    return {
+      grade,
+      total,
+      overallFeedback,
+      recommendations,
+      scores: {
+        '네이버 플레이스': { score: naverPlace, max: 40 },
+        '인스타그램': { score: instagram, max: 15 },
+        '블로그 마케팅': { score: blogMarketing, max: 10 },
+        '구글 마케팅': { score: google, max: 5 },
+        '유료 광고': { score: paidAds, max: 30 }
+      }
+    };
+  };
+
   const submitSurvey = async () => {
     try {
+      // 점수 계산 및 피드백 생성
+      const scores = calculateScore(surveyData);
+      const feedback = generateFeedback(scores, surveyData);
+      setSurveyResults(feedback);
+
       const response = await fetch('/api/survey', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(surveyData),
+        body: JSON.stringify({
+          ...surveyData,
+          results: feedback
+        }),
       });
       
       if (response.ok) {
@@ -158,6 +335,7 @@ export default function Home() {
   };
 
   const resetSurvey = () => {
+    setSurveyResults(null);
     setSurveyData({
       storeName: '',
       storeType: '',
@@ -828,10 +1006,81 @@ export default function Home() {
                 소중한 시간을 내어 설문에 참여해주셔서 감사합니다.<br/>
                 제출하신 정보는 매장 맞춤 마케팅 컨설팅에 활용됩니다.
               </p>
+
+              {/* 설문 결과 표시 */}
+              {surveyResults && (
+                <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100">
+                  <h3 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    📊 SNS 마케팅 건강 진단 결과
+                  </h3>
+                  
+                  {/* 총점 및 등급 */}
+                  <div className="text-center mb-8">
+                    <div className="inline-flex items-center gap-4 bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200">
+                      <div className="text-4xl font-bold text-blue-600">{surveyResults.total}점</div>
+                      <div className="text-3xl font-bold text-purple-600">({surveyResults.grade}등급)</div>
+                    </div>
+                  </div>
+
+                  {/* 전체 평가 */}
+                  <div className="bg-gray-50 p-6 rounded-xl mb-6">
+                    <h4 className="text-lg font-semibold mb-3 text-gray-800">📝 종합 평가</h4>
+                    <p className="text-gray-700 leading-relaxed">{surveyResults.overallFeedback}</p>
+                  </div>
+
+                  {/* 영역별 점수 */}
+                  <div className="mb-6">
+                    <h4 className="text-lg font-semibold mb-4 text-gray-800">📈 영역별 점수</h4>
+                    <div className="space-y-3">
+                      {Object.entries(surveyResults.scores).map(([area, scoreData]: [string, any]) => (
+                        <div key={area} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                          <span className="font-medium text-gray-700">{area}</span>
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1 bg-gray-200 rounded-full h-2 w-32">
+                              <div 
+                                className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                                style={{ width: `${(scoreData.score / scoreData.max) * 100}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm font-medium text-gray-600 min-w-[50px]">
+                              {scoreData.score}/{scoreData.max}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 개선 제안 */}
+                  {surveyResults.recommendations.length > 0 && (
+                    <div className="bg-yellow-50 p-6 rounded-xl border border-yellow-200">
+                      <h4 className="text-lg font-semibold mb-4 text-yellow-800">💡 맞춤 개선 제안</h4>
+                      <ul className="space-y-3">
+                        {surveyResults.recommendations.map((recommendation: string, index: number) => (
+                          <li key={index} className="flex items-start gap-3 text-yellow-700">
+                            <span className="text-yellow-500 font-bold mt-1">•</span>
+                            <span className="leading-relaxed">{recommendation}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="bg-blue-50 p-6 rounded-lg mb-6">
                 <p className="text-blue-800 font-medium">
-                  담당자가 검토 후 연락드리겠습니다.<br/>
-                  추가 문의사항이 있으시면 언제든 연락해주세요.
+                  {surveyResults ? (
+                    <>
+                      위 진단 결과를 바탕으로 더 자세한 컨설팅을 원하시면<br/>
+                      담당자가 연락드리겠습니다. 추가 문의사항이 있으시면 언제든 연락해주세요.
+                    </>
+                  ) : (
+                    <>
+                      담당자가 검토 후 연락드리겠습니다.<br/>
+                      추가 문의사항이 있으시면 언제든 연락해주세요.
+                    </>
+                  )}
                 </p>
               </div>
               
