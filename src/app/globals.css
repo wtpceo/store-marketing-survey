@@ -206,3 +206,115 @@ input[type="radio"]:focus {
 input[type="radio"]:hover {
   border-color: #3b82f6;
 }
+
+/* ========== 전체 텍스트 가독성 개선 ========== */
+
+/* 모든 제목 요소 가독성 강화 */
+h1, h2, h3, h4, h5, h6 {
+  color: #111827 !important;
+  font-weight: 700 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* 모든 텍스트 요소 기본 색상 강화 */
+p, span, div, label, li, td, th {
+  color: #374151 !important;
+  -webkit-text-fill-color: #374151 !important;
+}
+
+/* 진행 상황 텍스트 가독성 */
+.text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.text-gray-700 {
+  color: #374151 !important;
+}
+
+.text-gray-800 {
+  color: #1f2937 !important;
+}
+
+/* 그라데이션 텍스트도 가독성 확보 */
+.bg-gradient-to-r.from-blue-600.to-purple-600.bg-clip-text.text-transparent {
+  background: linear-gradient(to right, #1d4ed8, #7c3aed) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+}
+
+/* 버튼 텍스트 가독성 */
+button {
+  color: inherit !important;
+}
+
+button span, button div {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* 카드 내부 텍스트 강화 */
+.bg-white span, 
+.bg-white p, 
+.bg-white div, 
+.bg-white h1, 
+.bg-white h2, 
+.bg-white h3, 
+.bg-white h4 {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* 설문 완료 페이지 결과 텍스트 */
+.bg-gray-50 span,
+.bg-gray-50 p,
+.bg-blue-50 span,
+.bg-blue-50 p,
+.bg-yellow-50 span,
+.bg-yellow-50 p {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* 질문 텍스트 가독성 강화 */
+.text-lg {
+  color: #111827 !important;
+  font-weight: 600 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* 진행 단계 텍스트 */
+.text-sm {
+  color: #374151 !important;
+  font-weight: 500 !important;
+  -webkit-text-fill-color: #374151 !important;
+}
+
+/* 모든 브라우저에서 텍스트 선명도 개선 */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* iOS/Safari 전용 추가 보정 */
+@supports (-webkit-touch-callout: none) {
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    text-shadow: none !important;
+  }
+  
+  p, span, div:not(.bg-gradient-to-r) {
+    color: #1f2937 !important;
+    -webkit-text-fill-color: #1f2937 !important;
+  }
+  
+  /* 질문 텍스트 더 진하게 */
+  .text-lg, 
+  label:not(input + label) {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    font-weight: 700 !important;
+  }
+}
